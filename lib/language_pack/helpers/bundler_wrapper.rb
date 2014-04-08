@@ -1,9 +1,10 @@
 class LanguagePack::Helpers::BundlerWrapper
+  include LanguagePack::ShellHelpers
+
   class GemfileParseError < StandardError
     def initialize(error)
       msg = "There was an error parsing your Gemfile, we cannot continue\n"
-      msg << error.message
-      self.set_backtrace(error.backtrace)
+      msg << error
       super msg
     end
   end
@@ -90,11 +91,6 @@ class LanguagePack::Helpers::BundlerWrapper
     Bundler.ui = Bundler::UI::Shell.new({})
   end
 
-  def definition
-    Bundler.definition(@unlock)
-  rescue => e
-    raise GemfileParseError.new(e)
-  end
 
   def unlock
     @unlock = true
@@ -104,8 +100,28 @@ class LanguagePack::Helpers::BundlerWrapper
   end
 
   def ruby_version
-    unlock do
-      definition.ruby_version
+    instrument 'detec_ruby_version' do
+      puts "=============================================="
+      old_system_path = "/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+      env = { "PATH"     => "#{bundler_path}/bin:#{old_system_path}",
+              "GEM_PATH" => "#{File.join(bundler_path, "gems", BUNDLER_DIR_NAME)}:$GEM_PATH",
+              "RUBYLIB"  => File.join(bundler_path, "gems", BUNDLER_DIR_NAME, "lib")
+            }
+      command = "bundle platform --ruby"
+      puts run_stdout("which bundle", user_env: true, env: env)
+      puts run("which gem", env: env)
+      puts run("gem env", env: env)
+      puts run("gem list", env: env)
+      # puts run("env", env: env)
+      puts run("bundle -v", user_env: true, env: env)
+
+      output  = run_stdout(command, user_env: true, env: env)
+      raise GemfileParseError.new(run(command, user_env: true, env: env)) unless $?.success?
+      if output.match(/No ruby version specified/)
+        ""
+      else
+        output.chomp.sub('(', '').sub(')', '').split.join('-')
+      end
     end
   end
 
