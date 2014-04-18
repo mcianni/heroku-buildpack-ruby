@@ -92,8 +92,8 @@ class LanguagePack::Ruby < LanguagePack::Base
       setup_profiled
       allow_git do
         # Install couchbase dependencies 
-        install_libcouchbase
-        run("cp -R vendor/couchbase /app/vendor/couchbase")
+        #install_libcouchbase
+        #run("cp -R vendor/couchbase /app/vendor/couchbase")
 
         install_bundler_in_app
         build_bundler
