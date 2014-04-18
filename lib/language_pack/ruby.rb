@@ -22,6 +22,7 @@ class LanguagePack::Ruby < LanguagePack::Base
   DEFAULT_RUBY_VERSION = "ruby-2.0.0"
   RBX_BASE_URL         = "http://binaries.rubini.us/heroku"
   NODE_BP_PATH         = "vendor/node/bin"
+  COUCHBASE_VENDOR_URL = "http://packages.couchbase.com/clients/c/libcouchbase-2.3.0.tar.gz"
 
   # detects if this is a valid Ruby app
   # @return [Boolean] true if it's a Ruby app
@@ -89,6 +90,10 @@ class LanguagePack::Ruby < LanguagePack::Base
       setup_language_pack_environment
       setup_profiled
       allow_git do
+        # Install couchbase dependencies 
+        install_libcouchbase
+        run("cp -R vendor/couchbase /app/vendor/couchbase")
+
         install_bundler_in_app
         build_bundler
         create_database_yml
@@ -101,6 +106,15 @@ class LanguagePack::Ruby < LanguagePack::Base
 
 private
 
+  def install_libcouchbase
+    topic("Installing libcouchbase")
+    bin_dir = "vendor/couchbase"
+    FileUtils.mkdir_p bin_dir
+    Dir.chdir(bin_dir) do |dir|
+      run("curl #{COUCHBASE_VENDOR_URL} -s -o - | tar xzf -")
+    end
+  end
+  
   # the base PATH environment variable to be used
   # @return [String] the resulting PATH
   def default_path
