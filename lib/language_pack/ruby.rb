@@ -24,7 +24,7 @@ class LanguagePack::Ruby < LanguagePack::Base
   NODE_BP_PATH         = "vendor/node/bin"
   COUCHBASE_VENDOR_URL = "http://packages.couchbase.com/clients/c/libcouchbase-2.3.0.tar.gz"
   VBUCKET_VENDOR_URL = "http://libcouchbase.s3.amazonaws.com/libvbucket.gz"
-  
+
   # detects if this is a valid Ruby app
   # @return [Boolean] true if it's a Ruby app
   def self.use?
@@ -543,6 +543,11 @@ WARNING
           libyaml_dir = "#{tmpdir}/#{LIBYAML_PATH}"
           install_libyaml(libyaml_dir)
 
+          # need to setup environment for couchbase gem
+          couchbase_dir = '/app/vendor/couchbase'
+          couchbase_inc = File.expand_path("#{couchbase_dir}/include")
+          couchbase_lib = File.expand_path("#{couchbase_dir}/lib")
+
           # need to setup compile environment for the psych gem
           yaml_include   = File.expand_path("#{libyaml_dir}/include").shellescape
           yaml_lib       = File.expand_path("#{libyaml_dir}/lib").shellescape
@@ -560,6 +565,10 @@ WARNING
             "NOKOGIRI_USE_SYSTEM_LIBRARIES" => "true"
           }
           env_vars["BUNDLER_LIB_PATH"] = "#{bundler_path}" if ruby_version.ruby_version == "1.8.7"
+
+          # setup couchbase build configuration for bundler
+          run("#{env_vars} bundle config build.couchbase --with-libcouchbase-dir=/app/vendor/couchbase")
+          
           puts "Running: #{bundle_command}"
           instrument "ruby.bundle_install" do
             bundle_time = Benchmark.realtime do
