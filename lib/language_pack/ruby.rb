@@ -108,7 +108,7 @@ class LanguagePack::Ruby < LanguagePack::Base
 private
 
   def install_libcouchbase
-    topic("Installing libcouchbase")
+    topic("Installing libcouchbase!")
     bin_dir = "vendor/couchbase"
     FileUtils.mkdir_p bin_dir
     Dir.chdir(bin_dir) do |dir|
@@ -467,15 +467,6 @@ WARNING
   #    #run("chmod +x #{path}")
   #  end
   #end
-
-  def install_libcouchbase
-    topic("Installing libcouchbase")
-    bin_dir = "vendor/couchbase"
-    FileUtils.mkdir_p bin_dir
-    Dir.chdir(bin_dir) do |dir|
-      run("curl #{COUCHBASE_VENDOR_URL} -s -o - | tar xzf -")
-    end
-  end
 
   # install libyaml into the LP to be referenced for psych compilation
   # @param [String] tmpdir to store the libyaml files
