@@ -22,7 +22,9 @@ class LanguagePack::Ruby < LanguagePack::Base
   DEFAULT_RUBY_VERSION = "ruby-2.0.0"
   RBX_BASE_URL         = "http://binaries.rubini.us/heroku"
   NODE_BP_PATH         = "vendor/node/bin"
-  COUCHBASE_VENDOR_URL = "http://packages.couchbase.com/clients/c/libcouchbase-2.3.0.tar.gz"
+  #COUCHBASE_VENDOR_URL = "http://packages.couchbase.com/clients/c/libcouchbase-2.3.0.tar.gz"
+  #COUCHBASE_VENDOR_URL = "http://packages.couchbase.com/clients/c/libcouchbase-2.3.0_ubuntu1004_amd64.tar"
+  COUCHBASE_VENDOR_URL = "http://mcbuildserver.herokuapp.com/output/4f1796b6-95f8-46db-8284-7f823e294ad7"
   #VBUCKET_VENDOR_URL = "http://libcouchbase.s3.amazonaws.com/libvbucket.gz"
 
   # detects if this is a valid Ruby app
