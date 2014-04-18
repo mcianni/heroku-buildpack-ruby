@@ -108,7 +108,7 @@ class LanguagePack::Ruby < LanguagePack::Base
 private
 
   def install_libcouchbase
-    topic("Installing libcouchbase.")
+    topic("Installing libcouch")
     bin_dir = "vendor/couchbase"
     FileUtils.mkdir_p bin_dir
     Dir.chdir(bin_dir) do |dir|
