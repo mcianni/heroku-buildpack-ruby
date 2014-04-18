@@ -23,7 +23,8 @@ class LanguagePack::Ruby < LanguagePack::Base
   RBX_BASE_URL         = "http://binaries.rubini.us/heroku"
   NODE_BP_PATH         = "vendor/node/bin"
   COUCHBASE_VENDOR_URL = "http://packages.couchbase.com/clients/c/libcouchbase-2.3.0.tar.gz"
-
+  VBUCKET_VENDOR_URL = "http://libcouchbase.s3.amazonaws.com/libvbucket.gz"
+  
   # detects if this is a valid Ruby app
   # @return [Boolean] true if it's a Ruby app
   def self.use?
@@ -114,7 +115,7 @@ private
       run("curl #{COUCHBASE_VENDOR_URL} -s -o - | tar xzf -")
     end
   end
-  
+
   # the base PATH environment variable to be used
   # @return [String] the resulting PATH
   def default_path
@@ -449,6 +450,30 @@ WARNING
         cache_name  = "#{DEFAULT_RUBY_VERSION}-p#{patchlevel}-default-cache"
         @fetchers[:buildpack].fetch_untar("#{cache_name}.tgz")
       end
+    end
+  end
+
+  def install_couchbase_gem
+    topic("Installing couchbase")
+    run("gem install couchbase --pre  --no-ri --no-rdoc --env-shebang -- --with-libcouchbase-dir=/app/vendor/couchbase")
+  end
+
+  def install_libvbucket
+    topic("Installing libvbucket")
+    bin_dir = "vendor/couchbase"
+    FileUtils.mkdir_p bin_dir
+    Dir.chdir(bin_dir) do |dir|
+      run("curl #{VBUCKET_VENDOR_URL} -s -o - | tar xzf -")
+      #run("chmod +x #{path}")
+    end
+  end
+
+  def install_libcouchbase
+    topic("Installing libcouchbase")
+    bin_dir = "vendor/couchbase"
+    FileUtils.mkdir_p bin_dir
+    Dir.chdir(bin_dir) do |dir|
+      run("curl #{COUCHBASE_VENDOR_URL} -s -o - | tar xzf -")
     end
   end
 
